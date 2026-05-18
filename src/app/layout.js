@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Report Center | PDFMCP",
-  description: "Generate and download GitHub activity reports in PDF and Excel formats.",
+  title: "GitPulse AI | Advanced PR & Commit Analyzer",
+  description: "AI-powered Pull Request analyzer, commit summaries, developer work breakdowns, and executive PDF/Excel report generator.",
 };
 
 export default function RootLayout({ children }) {

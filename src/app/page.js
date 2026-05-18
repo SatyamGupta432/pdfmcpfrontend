@@ -1,46 +1,120 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileSpreadsheet, FileText, GitBranch, Calendar, User, BookOpen, ChevronRight } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
+import DashboardView from "@/components/DashboardView";
+import AnalyticsView from "@/components/AnalyticsView";
+import LeaderboardView from "@/components/LeaderboardView";
+import LoginView from "@/components/LoginView";
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userToken, setUserToken] = useState("");
+  const [currentUser, setCurrentUser] = useState("");
+  const [userRepos, setUserRepos] = useState([]);
 
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [form, setForm] = useState({
     owner: "SatyamGupta432",
     repo: "UPYOG-djb",
     author: "SatyamGupta432",
-    month: 1,
-    year: 2024,
+    month: 5,
+    year: 2026,
   });
+
+  const [loading, setLoading] = useState({ analyze: false, pdf: false, excel: false });
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     const now = new Date();
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       month: now.getMonth() + 1,
-      year: now.getFullYear()
+      year: now.getFullYear(),
     }));
+
+    const savedToken = localStorage.getItem("gh_token");
+    const savedUser = localStorage.getItem("gh_user");
+    if (savedToken && savedUser) {
+      setUserToken(savedToken);
+      setCurrentUser(savedUser);
+      setIsLoggedIn(true);
+      setForm((prev) => ({ ...prev, owner: savedUser, author: savedUser }));
+    }
   }, []);
 
-  const [loading, setLoading] = useState({ pdf: false, excel: false });
+  const handleLoginSuccess = (token, username, repoList) => {
+    setUserToken(token);
+    setCurrentUser(username);
+    setUserRepos(repoList);
+    setIsLoggedIn(true);
+    if (repoList && repoList.length > 0) {
+      setForm((prev) => ({
+        ...prev,
+        owner: repoList[0].owner,
+        repo: repoList[0].repo,
+        author: username,
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, owner: username, author: username }));
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("gh_token");
+    localStorage.removeItem("gh_user");
+    setUserToken("");
+    setCurrentUser("");
+    setUserRepos([]);
+    setIsLoggedIn(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const setPastMonth = () => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 1);
+    setForm((prev) => ({
+      ...prev,
+      month: date.getMonth() + 1,
+      year: date.getFullYear(),
+    }));
+  };
+
+  const handleAnalyze = async () => {
+    setLoading((prev) => ({ ...prev, analyze: true }));
+    try {
+      const params = new URLSearchParams({ ...form, token: userToken }).toString();
+      const res = await fetch(`/api/analyze?${params}`);
+      if (!res.ok) {
+        throw new Error("Failed to analyze repository data.");
+      }
+      const json = await res.json();
+      setData(json);
+    } catch (err) {
+      console.error("Analysis Error:", err);
+      alert("Failed to analyze repository. Please check your network connection or credentials.");
+    } finally {
+      setLoading((prev) => ({ ...prev, analyze: false }));
+    }
+  };
+
   const handleDownload = async (type) => {
     setLoading((prev) => ({ ...prev, [type]: true }));
     try {
-      const queryParams = new URLSearchParams(form).toString();
+      const queryParams = new URLSearchParams({ ...form, token: userToken }).toString();
       const url = `/api/${type}?${queryParams}`;
-      
+
       const response = await fetch(url);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || `Failed to download ${type.toUpperCase()}`);
       }
-      
+
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -59,143 +133,41 @@ export default function Home() {
     }
   };
 
-  const setPastMonth = () => {
-    const date = new Date();
-    date.setMonth(date.getMonth() - 1);
-    setForm((prev) => ({
-      ...prev,
-      month: date.getMonth() + 1,
-      year: date.getFullYear(),
-    }));
-  };
-
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+  if (!isLoggedIn) {
+    return <LoginView onLoginSuccess={handleLoginSuccess} />;
+  }
 
   return (
-    <div className="glass-card">
-      <header style={{ marginBottom: "2rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-          <div style={{ padding: "0.5rem", background: "var(--primary)", borderRadius: "10px" }}>
-            <GitBranch size={24} color="white" />
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", width: "100%" }}>
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} owner={form.owner} />
+      <div style={{ display: "flex", flex: 1, width: "100%", position: "relative" }}>
+        <div style={{ display: "flex", width: "100%", minHeight: "100%" }}>
+          <div className="sidebar-container" style={{ flexShrink: 0 }}>
+            <Sidebar
+              form={form}
+              setForm={setForm}
+              userRepos={userRepos}
+              onLogout={handleLogout}
+              currentUser={currentUser}
+            />
           </div>
-          <h1>Report Center</h1>
+          <main className="main-container" style={{ flex: 1, padding: "2.5rem 2rem", width: "100%", overflowX: "hidden" }}>
+            {activeTab === "dashboard" && (
+              <DashboardView
+                form={form}
+                handleChange={handleChange}
+                setPastMonth={setPastMonth}
+                loading={loading}
+                handleDownload={handleDownload}
+                data={data}
+                onAnalyze={handleAnalyze}
+              />
+            )}
+            {activeTab === "analytics" && <AnalyticsView data={data} />}
+            {activeTab === "leaderboard" && <LeaderboardView owner={form.owner} repo={form.repo} />}
+          </main>
         </div>
-        <p className="subtitle">Generate and download GitHub activity reports</p>
-      </header>
-
-      <form onSubmit={(e) => e.preventDefault()}>
-        <div className="input-group">
-          <label><User size={14} style={{ marginRight: "4px" }} /> Repository Owner</label>
-          <input
-            type="text"
-            name="owner"
-            value={form.owner}
-            onChange={handleChange}
-            className="input-field"
-            placeholder="e.g. SatyamGupta432"
-          />
-        </div>
-
-        <div className="input-group">
-          <label><BookOpen size={14} style={{ marginRight: "4px" }} /> Repository Name</label>
-          <input
-            type="text"
-            name="repo"
-            value={form.repo}
-            onChange={handleChange}
-            className="input-field"
-            placeholder="e.g. UPYOG-djb"
-          />
-        </div>
-
-        <div className="input-group">
-          <label><User size={14} style={{ marginRight: "4px" }} /> Author Username</label>
-          <input
-            type="text"
-            name="author"
-            value={form.author}
-            onChange={handleChange}
-            className="input-field"
-            placeholder="e.g. SatyamGupta432"
-          />
-        </div>
-
-        <div className="grid-cols-2">
-          <div className="input-group">
-            <label><Calendar size={14} style={{ marginRight: "4px" }} /> Month</label>
-            <select
-              name="month"
-              value={form.month}
-              onChange={handleChange}
-              className="input-field"
-            >
-              {months.map((m, i) => (
-                <option key={m} value={i + 1}>{m}</option>
-              ))}
-            </select>
-          </div>
-          <div className="input-group">
-            <label><Calendar size={14} style={{ marginRight: "4px" }} /> Year</label>
-            <select
-              name="year"
-              value={form.year}
-              onChange={handleChange}
-              className="input-field"
-            >
-              {years.map((y) => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <button 
-          type="button" 
-          onClick={setPastMonth}
-          style={{ 
-            background: "none", 
-            border: "none", 
-            color: "var(--primary)", 
-            fontSize: "0.75rem", 
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "2px",
-            marginBottom: "1rem"
-          }}
-        >
-          Quick select past month <ChevronRight size={12} />
-        </button>
-
-        <div className="btn-container">
-          <button
-            type="button"
-            className="btn btn-excel"
-            onClick={() => handleDownload("excel")}
-            disabled={loading.excel}
-          >
-            {loading.excel ? "Generating..." : <><FileSpreadsheet size={18} /> Excel</>}
-          </button>
-          <button
-            type="button"
-            className="btn btn-pdf"
-            onClick={() => handleDownload("pdf")}
-            disabled={loading.pdf}
-          >
-            {loading.pdf ? "Generating..." : <><FileText size={18} /> PDF</>}
-          </button>
-        </div>
-      </form>
-
-      <footer style={{ marginTop: "2rem", textAlign: "center", fontSize: "0.75rem", color: "#64748b" }}>
-        Powered by PDFMCP Backend
-      </footer>
+      </div>
     </div>
   );
 }
