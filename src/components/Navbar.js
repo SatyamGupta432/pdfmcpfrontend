@@ -1,9 +1,10 @@
 import React from "react";
-import { GitBranch, Sparkles, BarChart2, Award, Terminal, CheckCircle2 } from "lucide-react";
+import { GitBranch, Sparkles, BarChart2, Award, Terminal, CheckCircle2, GitPullRequest } from "lucide-react";
 
 export default function Navbar({ activeTab, setActiveTab, owner }) {
   const tabs = [
     { id: "dashboard", label: "AI PR Analyzer", icon: Sparkles },
+    { id: "pr-review", label: "PR Code Review", icon: GitPullRequest },
     { id: "analytics", label: "Velocity Analytics", icon: BarChart2 },
     { id: "leaderboard", label: "Leaderboard", icon: Award },
   ];

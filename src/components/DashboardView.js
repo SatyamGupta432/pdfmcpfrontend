@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Sparkles, FileSpreadsheet, FileText, FileCode, CheckCircle, AlertTriangle, Bug, Zap, Shield, GitCommit, Copy, RefreshCw, ChevronDown, ChevronUp, Layers, UserCheck } from "lucide-react";
+import { Sparkles, FileSpreadsheet, FileText, FileCode, CheckCircle, AlertTriangle, Bug, Zap, Shield, GitCommit, Copy, RefreshCw, ChevronDown, ChevronUp, Layers, UserCheck, Database } from "lucide-react";
 
 export default function DashboardView({ form, handleChange, setPastMonth, loading, handleDownload, data, onAnalyze }) {
   const [expandedCommit, setExpandedCommit] = useState(null);

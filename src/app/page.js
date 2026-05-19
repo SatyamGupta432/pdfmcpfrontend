@@ -7,6 +7,7 @@ import DashboardView from "@/components/DashboardView";
 import AnalyticsView from "@/components/AnalyticsView";
 import LeaderboardView from "@/components/LeaderboardView";
 import LoginView from "@/components/LoginView";
+import PRReviewView from "@/components/PRReviewView";
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -164,6 +165,7 @@ export default function Home() {
               />
             )}
             {activeTab === "analytics" && <AnalyticsView data={data} />}
+            {activeTab === "pr-review" && <PRReviewView token={userToken} />}
             {activeTab === "leaderboard" && <LeaderboardView owner={form.owner} repo={form.repo} />}
           </main>
         </div>
