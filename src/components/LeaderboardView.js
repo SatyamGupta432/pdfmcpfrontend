@@ -3,7 +3,7 @@ import { Award, Trophy, Star, ShieldCheck, Zap, User } from "lucide-react";
 
 export default function LeaderboardView() {
   const leaders = [
-    { rank: 1, name: "SatyamGupta432", role: "Engineering Lead", commits: 48, loc: "+4,850", risk: "Low (3.2%)", score: "99.4%", avatarBg: "linear-gradient(135deg, #f59e0b, #d97706)" },
+    { rank: 1, name: "SatyamGupta432", role: "Engineering Lead", commits: 48, loc: "+4,850", risk: "Low (3.2%)", score: "99.4%", avatarBg: "linear-gradient(135deg, #f59e0b, #d97706)", modules: "Auth, Water Connection" },
   ];
 
   return (
@@ -27,6 +27,7 @@ export default function LeaderboardView() {
               <th style={{ padding: "1rem 1.5rem" }}>Commits</th>
               <th style={{ padding: "1rem 1.5rem" }}>LoC Impact</th>
               <th style={{ padding: "1rem 1.5rem" }}>Risk Ratio</th>
+              <th style={{ padding: "1rem 1.5rem" }}>Modules Impacted</th>
               <th style={{ padding: "1rem 1.5rem" }}>AI Score</th>
             </tr>
           </thead>
@@ -53,6 +54,9 @@ export default function LeaderboardView() {
                 <td style={{ padding: "1.25rem 1.5rem", fontFamily: "monospace", color: "#34d399", fontWeight: "600" }}>{dev.loc}</td>
                 <td style={{ padding: "1.25rem 1.5rem" }}>
                   <span className={`badge ${dev.risk.includes("High") ? "badge-risk-high" : dev.risk.includes("Medium") ? "badge-risk-medium" : "badge-risk-low"}`}>{dev.risk}</span>
+                </td>
+                <td style={{ padding: "1.25rem 1.5rem", color: "#cbd5e1", fontSize: "0.9rem" }}>
+                  {dev.modules}
                 </td>
                 <td style={{ padding: "1.25rem 1.5rem" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#34d399", fontWeight: "800", fontSize: "1.1rem" }}>

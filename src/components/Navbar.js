@@ -5,6 +5,7 @@ export default function Navbar({ activeTab, setActiveTab, owner }) {
   const tabs = [
     { id: "dashboard", label: "AI PR Analyzer", icon: Sparkles },
     { id: "pr-review", label: "PR Code Review", icon: GitPullRequest },
+    { id: "module-history", label: "Module History", icon: Terminal },
     { id: "analytics", label: "Velocity Analytics", icon: BarChart2 },
     { id: "leaderboard", label: "Leaderboard", icon: Award },
   ];

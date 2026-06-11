@@ -28,6 +28,9 @@ export default function Sidebar({ form, setForm, userRepos, onLogout, currentUse
           <div style={{ fontSize: "0.8rem", color: "#94a3b8", display: "flex", alignItems: "center", gap: "0.25rem", marginTop: "0.25rem" }}>
             <span>Dev:</span> <span style={{ color: "#818cf8", fontWeight: "600" }}>{form.author}</span>
           </div>
+          <div style={{ fontSize: "0.8rem", color: "#94a3b8", display: "flex", alignItems: "center", gap: "0.25rem", marginTop: "0.25rem" }}>
+            <span>Module:</span> <span style={{ color: "#34d399", fontWeight: "600" }}>{form.module || "All Modules"}</span>
+          </div>
         </div>
       </div>
 
@@ -127,7 +130,7 @@ export default function Sidebar({ form, setForm, userRepos, onLogout, currentUse
             <h3 style={{ textAlign: "center", color: "white", fontSize: "1.25rem", fontWeight: "700", marginBottom: "0.5rem" }}>
               Confirm Logout
             </h3>
-            
+
             <p style={{ textAlign: "center", color: "#94a3b8", fontSize: "0.9rem", marginBottom: "2rem", lineHeight: "1.5" }}>
               Are you sure you want to remove <strong style={{ color: "#e2e8f0" }}>{currentUser}</strong> from your stored accounts?
             </p>

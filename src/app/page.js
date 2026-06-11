@@ -8,6 +8,7 @@ import AnalyticsView from "@/components/AnalyticsView";
 import LeaderboardView from "@/components/LeaderboardView";
 import LoginView from "@/components/LoginView";
 import PRReviewView from "@/components/PRReviewView";
+import ModuleHistoryView from "@/components/ModuleHistoryView";
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,6 +21,7 @@ export default function Home() {
     owner: "SatyamGupta432",
     repo: "UPYOG-djb",
     author: "SatyamGupta432",
+    module: "All Modules",
     month: 5,
     year: 2026,
   });
@@ -166,6 +168,7 @@ export default function Home() {
             )}
             {activeTab === "analytics" && <AnalyticsView data={data} />}
             {activeTab === "pr-review" && <PRReviewView token={userToken} />}
+            {activeTab === "module-history" && <ModuleHistoryView form={form} token={userToken} />}
             {activeTab === "leaderboard" && <LeaderboardView owner={form.owner} repo={form.repo} />}
           </main>
         </div>
